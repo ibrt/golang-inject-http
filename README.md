@@ -7,8 +7,8 @@ HTTP client module for the [golang-inject](https://github.com/ibrt/golang-inject
 
 ### Basic Usage
 
-This module injects a *http.Client into Go context. It provides both a real and a mock implementation for use in tests.
-Beyond being useful by itself, it is also a minimal example of how to tie together modules using the
+This module injects a `*http.Client` into Go context. It provides both a real and a mock implementation for use in 
+tests. Beyond being useful by itself, it is also a minimal example of how to tie together modules using the
 [golang-inject](https://github.com/ibrt/golang-inject) framework, and how to easily test implementations using the
 [golang-fixtures](https://github.com/ibrt/golang-fixtures) test suites.
 
