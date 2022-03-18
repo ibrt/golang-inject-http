@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ibrt/golang-errors/errorz"
 	"github.com/ibrt/golang-inject/injectz"
 )
 
@@ -47,5 +48,15 @@ func NewSingletonInjector(httpClient *http.Client) injectz.Injector {
 
 // Get extracts the *http.Client from context, panics if not found.
 func Get(ctx context.Context) *http.Client {
-	return ctx.Value(httpContextKey).(*http.Client)
+	clk := MaybeGet(ctx)
+	errorz.Assertf(clk != nil, "httpz: not initialized", errorz.Skip())
+	return clk
+}
+
+// MaybeGet is like Get but returns nil if not found.
+func MaybeGet(ctx context.Context) *http.Client {
+	if clk, ok := ctx.Value(httpContextKey).(*http.Client); ok {
+		return clk
+	}
+	return nil
 }
