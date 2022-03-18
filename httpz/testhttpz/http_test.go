@@ -23,7 +23,7 @@ func TestHelpers(t *testing.T) {
 
 type Suite struct {
 	*fixturez.DefaultConfigMixin
-	HTTPZ *Helper
+	HTTP *Helper
 }
 
 func (s *Suite) TestHelper(ctx context.Context, t *testing.T) {
@@ -33,7 +33,7 @@ func (s *Suite) TestHelper(ctx context.Context, t *testing.T) {
 
 type MockSuite struct {
 	*fixturez.DefaultConfigMixin
-	HTTPZ *MockHelper
+	HTTP *MockHelper
 }
 
 func (s *MockSuite) TestMockHelper(ctx context.Context, t *testing.T) {
