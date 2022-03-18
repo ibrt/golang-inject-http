@@ -12,14 +12,14 @@ import (
 type contextKey int
 
 const (
-	httpClientContextKey contextKey = iota
+	httpContextKey contextKey = iota
 )
 
 var (
 	_ injectz.Initializer = Initializer
 )
 
-// Initializer is a HTTP client initializer.
+// Initializer is a *http.Client initializer.
 func Initializer(_ context.Context) (injectz.Injector, injectz.Releaser) {
 	return NewSingletonInjector(&http.Client{
 		Transport: &http.Transport{
@@ -40,12 +40,12 @@ func Initializer(_ context.Context) (injectz.Injector, injectz.Releaser) {
 	}), injectz.NewNoopReleaser()
 }
 
-// NewSingletonInjector always injects the given HTTP client.
+// NewSingletonInjector always injects the given *http.Client.
 func NewSingletonInjector(httpClient *http.Client) injectz.Injector {
-	return injectz.NewSingletonInjector(httpClientContextKey, httpClient)
+	return injectz.NewSingletonInjector(httpContextKey, httpClient)
 }
 
-// Get returns the HTTP client, panics if not found.
+// Get extracts the *http.Client from context, panics if not found.
 func Get(ctx context.Context) *http.Client {
-	return ctx.Value(httpClientContextKey).(*http.Client)
+	return ctx.Value(httpContextKey).(*http.Client)
 }
