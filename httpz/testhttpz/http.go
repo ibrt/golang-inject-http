@@ -27,14 +27,16 @@ type Helper struct {
 }
 
 // BeforeSuite implements fixturez.BeforeSuite.
-func (f *Helper) BeforeSuite(ctx context.Context, _ *testing.T) context.Context {
+func (f *Helper) BeforeSuite(ctx context.Context, t *testing.T) context.Context {
+	t.Helper()
 	injector, releaser := httpz.Initializer(ctx)
 	f.releaser = releaser
 	return injector(ctx)
 }
 
 // AfterSuite implements fixturez.AfterSuite.
-func (f *Helper) AfterSuite(_ context.Context, _ *testing.T) {
+func (f *Helper) AfterSuite(_ context.Context, t *testing.T) {
+	t.Helper()
 	f.releaser()
 	f.releaser = nil
 }
@@ -45,35 +47,49 @@ type MockHelper struct {
 }
 
 // BeforeSuite implements fixturez.BeforeSuite.
-func (f *MockHelper) BeforeSuite(ctx context.Context, _ *testing.T) context.Context {
+func (f *MockHelper) BeforeSuite(ctx context.Context, t *testing.T) context.Context {
+	t.Helper()
 	injector, releaser := httpz.Initializer(ctx)
 	f.releaser = releaser
 	return injector(ctx)
 }
 
 // AfterSuite implements fixturez.AfterSuite.
-func (f *MockHelper) AfterSuite(_ context.Context, _ *testing.T) {
+func (f *MockHelper) AfterSuite(_ context.Context, t *testing.T) {
+	t.Helper()
 	f.releaser()
 	f.releaser = nil
 }
 
 // BeforeTest implements fixturez.BeforeTest.
-func (f *MockHelper) BeforeTest(ctx context.Context, _ *testing.T) context.Context {
-	gock.Intercept()
+func (f *MockHelper) BeforeTest(ctx context.Context, t *testing.T) context.Context {
+	t.Helper()
 	gock.InterceptClient(httpz.Get(ctx))
 	return ctx
 }
 
 // AfterTest implements fixturez.AfterTest.
 func (f *MockHelper) AfterTest(ctx context.Context, t *testing.T) {
-	if !t.Failed() && gock.IsPending() {
-		fixturez.RequireNoError(t, errorz.Errorf(
-			"httpz.MockHelper: %v pending mock(s) have not been matched",
-			errorz.A(len(gock.Pending())),
-			errorz.M("pendingMocks", getPendingMocks(gock.Pending()))))
+	t.Helper()
+
+	if gock.HasUnmatchedRequest() {
+		fixturez.AssertNoError(t, errorz.Errorf(
+			"httpz.MockHelper: %v outgoing request(s) did not match any mock",
+			errorz.A(len(gock.GetUnmatchedRequests())),
+			errorz.M("unmatchedRequests", gock.GetUnmatchedRequests()),
+			errorz.SkipPackage()))
 	}
 
-	gock.OffAll()
+	if gock.IsPending() {
+		fixturez.AssertNoError(t, errorz.Errorf(
+			"httpz.MockHelper: %v mock(s) have not been matched by outgoing requests",
+			errorz.A(len(gock.Pending())),
+			errorz.M("pendingMocks", getPendingMocks(gock.Pending())),
+			errorz.SkipPackage()))
+	}
+
+	gock.Flush()
+	gock.CleanUnmatchedRequest()
 	gock.RestoreClient(httpz.Get(ctx))
 }
 

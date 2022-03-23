@@ -62,12 +62,6 @@ func (s *MockSuite) TestMockHelper(ctx context.Context, t *testing.T) {
 	actualRespBody := &Response{}
 	fixturez.RequireNoError(t, json.Unmarshal(respBodyBuf, actualRespBody))
 	require.Equal(t, respBody, actualRespBody)
-
-	_, err = httpz.Get(ctx).Get("https://mock-server.xyz/path")
-	require.EqualError(t, err, `Get "https://mock-server.xyz/path": gock: cannot match any request`)
-
-	_, err = httpz.Get(ctx).Get("https://another-mock-server.xyz")
-	require.EqualError(t, err, `Get "https://another-mock-server.xyz": gock: cannot match any request`)
 }
 
 func TestGetPendingMocks(t *testing.T) {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ibrt/golang-fixtures/fixturez"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ibrt/golang-inject-http/httpz"
@@ -13,11 +12,13 @@ import (
 func TestModule(t *testing.T) {
 	injector, releaser := httpz.Initializer(context.Background())
 	defer releaser()
-	ctx := injector(context.Background())
-	httpClient := httpz.Get(ctx)
+
+	httpClient := httpz.Get(context.Background())
 	require.NotNil(t, httpClient)
-	require.Nil(t, httpz.MaybeGet(context.Background()))
-	fixturez.RequirePanicsWith(t, "httpz: not initialized", func() {
-		httpz.Get(context.Background())
-	})
+
+	httpClient = httpz.Get(injector(context.Background()))
+	require.NotNil(t, httpClient)
+
+	httpClient = httpz.Get(httpz.NewSingletonInjector(httpClient)(context.Background()))
+	require.NotNil(t, httpClient)
 }

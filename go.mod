@@ -3,9 +3,9 @@ module github.com/ibrt/golang-inject-http
 go 1.17
 
 require (
-	github.com/ibrt/golang-errors v1.0.0
-	github.com/ibrt/golang-fixtures v1.2.1
-	github.com/ibrt/golang-inject v1.0.1
+	github.com/ibrt/golang-errors v1.1.3
+	github.com/ibrt/golang-fixtures v1.2.4
+	github.com/ibrt/golang-inject v1.1.0
 	github.com/stretchr/testify v1.7.0
 	gopkg.in/h2non/gock.v1 v1.1.2
 )
